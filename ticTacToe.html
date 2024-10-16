@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic-Tac-Toe</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 5px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .cell {
+            width: 100px;
+            height: 100px;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            cursor: pointer;
+            border: 1px solid #ccc;
+        }
+
+        .cell:hover {
+            background-color: #e0e0e0;
+        }
+
+        .status {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+
+        button.restart {
+            padding: 10px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        button.reset {
+            padding: 10px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body onload=resetScores()>
+    <h1>Tic-Tac-Toe</h1>
+    <div class="game-board">
+        <div class="cell" data-index="0"></div>
+        <div class="cell" data-index="1"></div>
+        <div class="cell" data-index="2"></div>
+        <div class="cell" data-index="3"></div>
+        <div class="cell" data-index="4"></div>
+        <div class="cell" data-index="5"></div>
+        <div class="cell" data-index="6"></div>
+        <div class="cell" data-index="7"></div>
+        <div class="cell" data-index="8"></div>
+    </div>
+    <p class="status">Player X's turn</p>
+    <p class="status" id="xTextHere"></p> 
+    <p class="status" id="oTextHere"></p>
+    <p class="status" id="drawsTextHere"></p>
+    <button class="restart">Restart Game</button>
+    <button class="reset">Reset Scores</button>
+   
+
+    <script>
+        const cells = document.querySelectorAll('.cell');
+        const statusText = document.querySelector('.status');
+        const restartBtn = document.querySelector('.restart');
+        const resetBtn = document.querySelector('.reset');
+        let currentPlayer = 'X';
+        let gameState = ['', '', '', '', '', '', '', '', ''];
+        let gameActive = true;
+        let xScore = 0; //add in initial counter for scores
+        let oScore = 0; //add in initial counter for scores
+        let draws = 0; //add in counter for draws
+        let drawsText = "Draws: ";
+        let xWinsText = "X Wins: ";
+        let oWinsText = "O Wins: ";
+
+        const winningConditions = [
+            [0, 1, 2],
+            [3, 4, 5],
+            [6, 7, 8],
+            [0, 3, 6],
+            [1, 4, 7],
+            [2, 5, 8],
+            [0, 4, 8],
+            [2, 4, 6]
+        ];
+
+        function handleCellClick(event) {
+            console.log(event);
+            const clickedCell = event.target;
+            const clickedCellIndex = clickedCell.getAttribute('data-index');
+
+            if (gameState[clickedCellIndex] !== '' || !gameActive) {
+                return;
+            }
+
+            gameState[clickedCellIndex] = currentPlayer;
+            clickedCell.textContent = currentPlayer;
+            checkResult();
+        }
+
+        function checkResult() {
+            let roundWon = false;
+
+            for (let i = 0; i < winningConditions.length; i++) {
+                const winCondition = winningConditions[i];
+                let a = gameState[winCondition[0]];
+                let b = gameState[winCondition[1]];
+                let c = gameState[winCondition[2]];
+
+                if (a === '' || b === '' || c === '') {
+                    continue;
+                }
+
+                if (a === b && b === c) {
+                    roundWon = true;
+                    break;
+                }
+            }
+
+            if (roundWon) {
+                statusText.textContent = `Player ${currentPlayer} wins!`;
+                gameActive = false;
+                {if (currentPlayer == 'X')
+                    {xScore = xScore + 1
+                    xWinsText = "X Wins: " + xScore
+                    document.getElementById("xTextHere").innerHTML = xWinsText;}
+                else {oScore = oScore + 1
+                    oWinsText = "O Wins: " + oScore
+                    document.getElementById("oTextHere").innerHTML = oWinsText;
+                }
+                }
+                return;
+            }
+
+            if (!gameState.includes('')) {
+                statusText.textContent = 'Draw!';
+                gameActive = false;
+                draws = draws + 1
+                drawsText = "Draws: "+ draws
+                document.getElementById("drawsTextHere").innerHTML = drawsText;
+                return;
+            }
+
+            currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+            statusText.textContent = `Player ${currentPlayer}'s turn`;
+        }
+
+        function restartGame() {
+            currentPlayer = 'X';
+            gameState = ['', '', '', '', '', '', '', '', ''];
+            gameActive = true;
+            statusText.textContent = `Player ${currentPlayer}'s turn`;
+
+            cells.forEach(cell => {
+                cell.textContent = '';
+            });
+        }
+        
+
+        function resetScores() { //sets the scores back to 0 
+            xScore = 0;
+            oScore = 0;
+            draws = 0;
+            xWinsText = "X Wins: " + xScore;
+            oWinsText = "O Wins: " + oScore;
+            drawsText = "Draws: " + draws
+
+            document.getElementById("xTextHere").innerHTML = xWinsText;
+            document.getElementById("oTextHere").innerHTML = oWinsText;
+            document.getElementById("drawsTextHere").innerHTML = drawsText;
+
+        }
+
+        cells.forEach(cell => cell.addEventListener('click', handleCellClick));
+        restartBtn.addEventListener('click', restartGame);
+        resetBtn.addEventListener('click', resetScores);
+    </script>
+</body>
+</html>
